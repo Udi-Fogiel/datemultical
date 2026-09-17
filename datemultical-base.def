@@ -1,0 +1,472 @@
+%
+% datemultical: Named dates with multi-calendar formatting for LaTeX.
+%
+% Copyright (C) 2026 Amer Amikhteh
+%
+% This file is part of the datemultical package.
+%
+% This work is free software: you may redistribute it and/or modify
+% it under the terms of the LaTeX Project Public License as published
+% by the LaTeX Project, either version 1.3c of the License, or
+% (at your option) any later version.
+%
+% This work is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty
+% of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%
+% The full license text is available at:
+% https://www.latex-project.org/lppl/
+%
+% This work is "maintained" by Amer Amikhteh.
+%
+% The current maintainer of this work is Amer Amikhteh.
+%
+
+\ProvidesFile{datemultical-base.def}
+[2026/09/17 v0.1.0 Storage for named date data]
+
+\ExplSyntaxOn
+
+% =================================================
+% Storage
+% =================================================
+
+% RD = JDN - 1721425
+% JDN = RD + 1721425
+\int_const:Nn \c_dmc_rd_to_jdn_int { 1721425 }
+
+% Common storage
+\prop_new:N \g_dmc_rd_prop
+\prop_new:N \g_dmc_jdn_prop
+\prop_new:N \g_dmc_weekday_prop
+
+% Modern storage
+\prop_new:N \g_dmc_date_prop
+
+% Native storage
+\prop_new:N \g_dmc_gr_year_prop
+\prop_new:N \g_dmc_gr_month_prop
+\prop_new:N \g_dmc_gr_day_prop
+
+\prop_new:N \g_dmc_sh_year_prop
+\prop_new:N \g_dmc_sh_month_prop
+\prop_new:N \g_dmc_sh_day_prop
+
+\prop_new:N \g_dmc_lh_year_prop
+\prop_new:N \g_dmc_lh_month_prop
+\prop_new:N \g_dmc_lh_day_prop
+
+% =================================================
+% Lua result receiver
+% =================================================
+
+\cs_new_protected:Npn \dmcLuaStoreDynamic #1#2#3#4
+{
+  \bool_if:NF \g_dmc_native_bool
+  {
+    \prop_gput:Nnn
+    \g_dmc_date_prop
+    { #1 / #2 / #3 }
+    { #4 }
+  }
+}
+
+\cs_new_protected:Npn \dmcLuaStore #1#2#3#4#5
+{
+  \bool_if:NF \g_dmc_native_bool
+  {
+    \prop_gput:Nnn
+    \g_dmc_date_prop
+    { #1 / #2 / year }
+    { #3 }
+
+    \prop_gput:Nnn
+    \g_dmc_date_prop
+    { #1 / #2 / month }
+    { #4 }
+
+    \prop_gput:Nnn
+    \g_dmc_date_prop
+    { #1 / #2 / day }
+    { #5 }
+  }
+}
+
+\cs_new_protected:Npn \dmcLuaStoreRD #1#2
+{
+  \prop_gput:Nnn
+  \g_dmc_rd_prop
+  { #1 }
+  { #2 }
+}
+
+\cs_new_protected:Npn \dmcLuaStoreJDN #1#2
+{
+  \prop_gput:Nnn
+  \g_dmc_jdn_prop
+  { #1 }
+  { #2 }
+}
+
+\cs_new_protected:Npn \dmcLuaStoreWeekday #1#2
+{
+  \prop_gput:Nnn
+  \g_dmc_weekday_prop
+  { #1 }
+  { #2 }
+}
+
+% =================================================
+% Set date
+% =================================================
+
+\cs_new_protected:Npn \dmc_set:nnnnn #1#2#3#4#5
+{
+  \bool_if:NTF \g_dmc_native_bool
+  {
+    % -----------------------------------------
+    % Native backend
+    % -----------------------------------------
+
+    % First calculate and store JDN.
+    \prop_gput:Nnx
+    \g_dmc_jdn_prop
+    { #2 }
+    {
+      \dmc_date_to_jdn:nnnn
+      { #1 }
+      { #3 }
+      { #4 }
+      { #5 }
+    }
+
+    % Then calculate and store RD.
+    %
+    % The value stored in g_dmc_jdn_prop is expanded first;
+    % RD = JDN - 1721425.
+    \prop_gput:Nnx
+    \g_dmc_rd_prop
+    { #2 }
+    {
+      \int_eval:n
+      {
+        \prop_item:Nn
+        \g_dmc_jdn_prop
+        { #2 }
+        - \c_dmc_rd_to_jdn_int
+      }
+    }
+  }
+  {
+    % -----------------------------------------
+    % Modern Lua backend
+    % -----------------------------------------
+
+    \directlua{
+      dmc.set_date(
+      "\luaescapestring{#1}",
+      "\luaescapestring{#2}",
+      "\luaescapestring{#3}",
+      "\luaescapestring{#4}",
+      "\luaescapestring{#5}"
+      )
+    }
+  }
+}
+
+% =================================================
+% Get date part
+% =================================================
+
+\cs_new:Npn \dmc_get:nnn #1#2#3
+{
+  \bool_if:NTF \g_dmc_native_bool
+  {
+    % -----------------------------------------
+    % Native backend
+    % -----------------------------------------
+
+    \str_case:nnF { #3 }
+    {
+      { year }
+      {
+        \dmc_jdn_to_year:nn
+        { #1 }
+        {
+          \prop_item:Nn
+          \g_dmc_jdn_prop
+          { #2 }
+        }
+      }
+
+      { month }
+      {
+        \dmc_jdn_to_month:nn
+        { #1 }
+        {
+          \prop_item:Nn
+          \g_dmc_jdn_prop
+          { #2 }
+        }
+      }
+
+      { day }
+      {
+        \dmc_jdn_to_day:nn
+        { #1 }
+        {
+          \prop_item:Nn
+          \g_dmc_jdn_prop
+          { #2 }
+        }
+      }
+
+      { rd }
+      {
+        \prop_item:Nn
+        \g_dmc_rd_prop
+        { #2 }
+      }
+
+      { jdn }
+      {
+        \prop_item:Nn
+        \g_dmc_jdn_prop
+        { #2 }
+      }
+
+      { weekday }
+      {
+        \dmc_jdn_to_weekday:n
+        {
+          \prop_item:Nn
+          \g_dmc_jdn_prop
+          { #2 }
+        }
+      }
+    }
+    { }
+  }
+  {
+    % -----------------------------------------
+    % Modern Lua backend
+    % -----------------------------------------
+
+    \str_case:nnF { #3 }
+    {
+      { year }
+      {
+        \prop_item:Nn
+        \g_dmc_date_prop
+        { #1 / #2 / year }
+      }
+
+      { month }
+      {
+        \prop_item:Nn
+        \g_dmc_date_prop
+        { #1 / #2 / month }
+      }
+
+      { day }
+      {
+        \prop_item:Nn
+        \g_dmc_date_prop
+        { #1 / #2 / day }
+      }
+
+      { rd }
+      {
+        \prop_item:Nn
+        \g_dmc_rd_prop
+        { #2 }
+      }
+
+      { jdn }
+      {
+        \prop_item:Nn
+        \g_dmc_jdn_prop
+        { #2 }
+      }
+
+      { weekday }
+      {
+        \prop_item:Nn
+        \g_dmc_weekday_prop
+        { #2 }
+      }
+
+      { week }
+      {
+        \prop_item:Nn
+        \g_dmc_date_prop
+        { #1 / #2 / week }
+      }
+
+      { leap }
+      {
+        \prop_item:Nn
+        \g_dmc_date_prop
+        { #1 / #2 / leap }
+      }
+
+      { leap_month }
+      {
+        \prop_item:Nn
+        \g_dmc_date_prop
+        { #1 / #2 / leap_month }
+      }
+
+      { leap_day }
+      {
+        \prop_item:Nn
+        \g_dmc_date_prop
+        { #1 / #2 / leap_day }
+      }
+
+      { major }
+      {
+        \prop_item:Nn
+        \g_dmc_date_prop
+        { #1 / #2 / major }
+      }
+
+      { cycle }
+      {
+        \prop_item:Nn
+        \g_dmc_date_prop
+        { #1 / #2 / cycle }
+      }
+
+    }
+    { }
+  }
+}
+
+
+% =================================================
+% Public commands
+% =================================================
+
+\NewDocumentCommand \dmcset { O{gr} m m m m }
+{
+  \dmc_set:nnnnn
+  { #1 }
+  { #2 }
+  { #3 }
+  { #4 }
+  { #5 }
+}
+
+\NewExpandableDocumentCommand \dmcget { O{gr} m m }
+{
+  \dmc_get:nnn
+  { #1 }
+  { #2 }
+  { #3 }
+}
+
+
+% ---------------------------------
+% Variables for \dmcnew key parsing
+% ---------------------------------
+
+\tl_new:N \l__dmc_new_year_tl
+\tl_new:N \l__dmc_new_month_tl
+\tl_new:N \l__dmc_new_day_tl
+\tl_new:N \l__dmc_new_cycle_tl
+\tl_new:N \l__dmc_new_week_tl
+\tl_new:N \l__dmc_new_leap_tl
+\tl_new:N \l__dmc_new_leap_month_tl
+\tl_new:N \l__dmc_new_leap_day_tl
+\tl_new:N \l__dmc_new_major_tl
+% \tl_new:N \l__dmc_new_jdn_tl
+
+
+% ---------------------------------
+% Key definitions
+% ---------------------------------
+
+\keys_define:nn { dmc / newdate }
+{
+  year .tl_set:N       = \l__dmc_new_year_tl,
+  month .tl_set:N      = \l__dmc_new_month_tl,
+  day .tl_set:N        = \l__dmc_new_day_tl,
+  cycle .tl_set:N      = \l__dmc_new_cycle_tl,
+  week .tl_set:N       = \l__dmc_new_week_tl,
+  leap .tl_set:N       = \l__dmc_new_leap_tl,
+  leap_month .tl_set:N = \l__dmc_new_leap_month_tl,
+  leap_day .tl_set:N   = \l__dmc_new_leap_day_tl,
+  major .tl_set:N      = \l__dmc_new_major_tl,
+  % jdn .tl_set:N      = \l__dmc_new_jdn_tl,
+}
+
+% ---------------------------------
+% Clear temporary values
+% ---------------------------------
+
+\cs_new_protected:Npn \dmc_new_clear:
+{
+  \tl_clear:N \l__dmc_new_year_tl
+  \tl_clear:N \l__dmc_new_month_tl
+  \tl_clear:N \l__dmc_new_day_tl
+  \tl_clear:N \l__dmc_new_cycle_tl
+  \tl_clear:N \l__dmc_new_week_tl
+  \tl_clear:N \l__dmc_new_leap_tl
+  \tl_clear:N \l__dmc_new_leap_month_tl
+  \tl_clear:N \l__dmc_new_leap_day_tl
+  \tl_clear:N \l__dmc_new_major_tl
+  % \tl_clear:N \l__dmc_new_jdn_tl
+}
+
+% ---------------------------------
+% Main implementation of \dmcnew
+% ---------------------------------
+\cs_new_protected:Npn \dmc_lua_set:nnn #1#2#3
+{
+  \directlua
+  {
+    dmc.set_date_kv(
+    "\luaescapestring{#1}",
+    "\luaescapestring{#2}",
+    "\luaescapestring{#3}"
+    )
+  }
+}
+
+\cs_new_protected:Npn \dmc_new:nnn #1#2#3
+{
+  \bool_if:NTF \g_dmc_native_bool
+  {
+    % Native backend: use the old interface.
+    \dmc_new_clear:
+    \keys_set:nn { dmc / newdate } { #3 }
+
+    \dmc_set:nnnnn
+    { #1 }
+    { #2 }
+    { \l__dmc_new_year_tl }
+    { \l__dmc_new_month_tl }
+    { \l__dmc_new_day_tl }
+  }
+  {
+    % Lua backend: send the complete key-value payload.
+    \dmc_lua_set:nnn
+    { #1 }
+    { #2 }
+    { #3 }
+  }
+}
+
+% ---------------------------------
+% Public command
+% ---------------------------------
+
+\NewDocumentCommand \dmcnew { O{gr} m m }
+{
+  \dmc_new:nnn { #1 } { #2 } { #3 }
+}
+
+\ExplSyntaxOff
+
+\endinput

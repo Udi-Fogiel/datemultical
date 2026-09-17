@@ -1,0 +1,173 @@
+% datemultical-engine-jdn.def
+%
+% datemultical: Named dates with multi-calendar formatting for LaTeX.
+%
+% Copyright (C) 2026 Amer Amikhteh
+%
+% This file is part of the datemultical-engine package.
+%
+% It provides common Julian Day Number (JDN) conversion interfaces
+% for supported calendar backends, including internal expandable
+% functions and user-level commands for converting dates to JDN
+% and JDN values back to calendar dates.
+%
+% This work is free software: you may redistribute it and/or modify
+% it under the terms of the LaTeX Project Public License as published
+% by the LaTeX Project, either version 1.3c of the License, or
+% (at your option) any later version.
+%
+% This work is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty
+% of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%
+% The full license text is available at:
+% https://www.latex-project.org/lppl/
+%
+% This work is "maintained" by Amer Amikhteh.
+%
+% The current maintainer of this work is Amer Amikhteh.
+
+\ProvidesFile{datemultical-engine-rd.def}
+[2026/09/17 v0.1.0 Julian Day Number conversion interface]
+
+% =================================================
+% Date -> JDN
+% =================================================
+
+\cs_new:Npn \dmc_date_to_jdn:nnnn #1#2#3#4
+{
+  \str_case:nnF {#1}
+  {
+    {gr}
+    {
+      \dmc_gr_to_jdn:nnn {#2}{#3}{#4}
+    }
+
+    {sh}
+    {
+      \dmc_sh_to_jdn:nnn {#2}{#3}{#4}
+    }
+
+    {lh}
+    {
+      \dmc_lh_to_jdn:nnn {#2}{#3}{#4}
+    }
+  }
+  {
+    \dmc_gr_to_jdn:nnn {#2}{#3}{#4}
+  }
+}
+
+% =================================================
+% JDN -> year
+% Expandable
+% =================================================
+
+\cs_new:Npn \dmc_jdn_to_year:nn #1#2
+{
+  \str_case:nnF {#1}
+  {
+    {gr}
+    {
+      \dmc_jdn_to_gr_year:n {#2}
+    }
+
+    {sh}
+    {
+      \dmc_jdn_to_sh_year:n {#2}
+    }
+
+    {lh}
+    {
+      \dmc_jdn_to_lh_year:n {#2}
+    }
+  }
+  {
+    \dmc_jdn_to_gr_year:n {#2}
+  }
+}
+
+% =================================================
+% JDN -> month
+% Expandable
+% =================================================
+
+\cs_new:Npn \dmc_jdn_to_month:nn #1#2
+{
+  \str_case:nnF {#1}
+  {
+    {gr}
+    {
+      \dmc_jdn_to_gr_month:n {#2}
+    }
+
+    {sh}
+    {
+      \dmc_jdn_to_sh_month:n {#2}
+    }
+
+    {lh}
+    {
+      \dmc_jdn_to_lh_month:n {#2}
+    }
+  }
+  {
+    \dmc_jdn_to_gr_month:n {#2}
+  }
+}
+
+% =================================================
+% JDN -> day
+% Expandable
+% =================================================
+
+\cs_new:Npn \dmc_jdn_to_day:nn #1#2
+{
+  \str_case:nnF {#1}
+  {
+    {gr}
+    {
+      \dmc_jdn_to_gr_day:n {#2}
+    }
+
+    {sh}
+    {
+      \dmc_jdn_to_sh_day:n {#2}
+    }
+
+    {lh}
+    {
+      \dmc_jdn_to_lh_day:n {#2}
+    }
+  }
+  {
+    \dmc_jdn_to_gr_day:n {#2}
+  }
+}
+
+
+% =================================================
+% User-level JDN conversion commands
+% =================================================
+
+\NewExpandableDocumentCommand{\dmcjdn}{mmmm}
+{ \dmc_date_to_jdn:nnnn {#1}{#2}{#3}{#4} }
+
+\NewExpandableDocumentCommand{\dmcyear}{mm}
+{ \dmc_jdn_to_year:nn {#1}{#2} }
+
+\NewExpandableDocumentCommand{\dmcmonth}{mm}
+{ \dmc_jdn_to_month:nn {#1}{#2} }
+
+\NewExpandableDocumentCommand{\dmcday}{mm}
+{ \dmc_jdn_to_day:nn {#1}{#2} }
+
+\NewDocumentCommand{\dmcdate}{mm}
+{
+  \dmcyear{#1}{#2}/
+  \dmcmonth{#1}{#2}/
+  \dmcday{#1}{#2}
+}
+
+
+\endinput

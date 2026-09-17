@@ -1,0 +1,201 @@
+% datemultical-engine-lh.def
+%
+% datemultical: Named dates with multi-calendar formatting for LaTeX.
+%
+% Copyright (C) 2026 Amer Amikhteh
+%
+% This file is part of the datemultical-engine package.
+%
+% This work is free software: you may redistribute it and/or modify
+% it under the terms of the LaTeX Project Public License as published
+% by the LaTeX Project, either version 1.3c of the License, or
+% (at your option) any later version.
+%
+% This work is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty
+% of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%
+% The full license text is available at:
+% https://www.latex-project.org/lppl/
+%
+% This work is "maintained" by Amer Amikhteh.
+%
+% The current maintainer of this work is Amer Amikhteh.
+
+
+\ProvidesFile{datemultical-engine-lh.def}
+[2026/09/17 v0.1.0 Lunar Hijri calendar rules for the TeX backend]
+
+% ------------------------------------------------
+% Lunar Hijri leap-year test
+% ------------------------------------------------
+
+\cs_new:Npn \dmc_is_lh_leap:n #1
+{
+    \bool_if:nTF
+    {
+        \int_compare_p:nNn
+        {
+            \int_mod:nn { 11 * #1 + 14 } {30}
+        }
+        <
+            {11}
+    }
+    {1}
+    {0}
+}
+
+% ------------------------------------------------
+% Lunar Hijri month length
+% ------------------------------------------------
+
+\cs_new:Npn \dmc_lh_month_length:nn #1#2
+{
+    \int_case:nnF {#2}
+    {
+        {1}{30}
+        {2}{29}
+        {3}{30}
+        {4}{29}
+        {5}{30}
+        {6}{29}
+        {7}{30}
+        {8}{29}
+        {9}{30}
+        {10}{29}
+        {11}{30}
+        {12}{ \int_eval:n {29 + \dmc_is_lh_leap:n {#1}} }
+    }
+    {29}
+}
+
+% ------------------------------------------------
+% Lunar Hijri -> JDN
+% ------------------------------------------------
+
+\cs_new:Npn \dmc_lh_to_jdn:nnn #1#2#3
+{
+    \int_eval:n
+    {
+        #3
+        +
+        \int_div_truncate:nn {59 * (#2 - 1) + 1}{2}
+        +
+        354 * (#1 - 1)
+        +
+        \int_div_truncate:nn {3 + 11 * #1}{30}
+        +
+        1948439 - 1
+    }
+}
+
+% ------------------------------------------------
+% JDN -> Lunar Hijri
+% ------------------------------------------------
+
+\cs_new:Npn \dmc_lh_days:n #1
+{
+    \int_eval:n
+    {
+        #1
+        -
+        \dmc_lh_to_jdn:nnn
+        {
+            \dmc_lh_year:n {#1}
+        }
+        {1}
+        {1}
+        + 1
+    }
+}
+
+\cs_new:Npn \dmc_lh_year:n #1
+{
+    \int_eval:n
+    {
+        \int_div_truncate:nn
+        {30 * (#1 - 1948439) + 10646}
+        {10631}
+    }
+}
+
+
+% ------------------------------------------------
+% Days within a 59-day two-month block
+% ------------------------------------------------
+
+\cs_new:Npn \dmc_lh_block:n #1
+{
+    \int_div_truncate:nn {#1 - 1}{59}
+}
+
+\cs_new:Npn \dmc_lh_remainder:n #1
+{
+    \int_mod:nn {#1 - 1}{59}
+}
+
+% ------------------------------------------------
+% JDN -> Lunar Hijri month
+% ------------------------------------------------
+
+\cs_new:Npn \dmc_lh_month_from_days:n #1
+{
+    \int_eval:n
+    {
+        2 * \dmc_lh_block:n {#1}
+        +
+        \int_compare:nTF
+        {
+            \dmc_lh_remainder:n {#1} < 30
+        }
+        {1}
+        {2}
+    }
+}
+
+\cs_new:Npn \dmc_jdn_to_lh_month:n #1
+{
+    \dmc_lh_month_from_days:n
+    {
+        \dmc_lh_days:n {#1}
+    }
+}
+
+% ------------------------------------------------
+% JDN -> Lunar Hijri day
+% ------------------------------------------------
+
+\cs_new:Npn \dmc_lh_day_from_days:n #1
+{
+    \int_eval:n
+    {
+        \dmc_lh_remainder:n {#1}
+        -
+        \int_compare:nTF
+        {
+            \dmc_lh_remainder:n {#1} < 30
+        }
+        {0}
+        {30}
+        + 1
+    }
+}
+
+\cs_new:Npn \dmc_jdn_to_lh_day:n #1
+{
+    \dmc_lh_day_from_days:n
+    {
+        \dmc_lh_days:n {#1}
+    }
+}
+
+% ------------------------------------------------
+% JDN -> Lunar Hijri year
+% ------------------------------------------------
+
+\cs_new:Npn \dmc_jdn_to_lh_year:n #1
+{
+    \dmc_lh_year:n {#1}
+}
+
+\endinput

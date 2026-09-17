@@ -1,0 +1,15 @@
+
+# Python cache
+__pycache__/
+*.pyc
+
+# LaTeX auxiliary and generated files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.xdv
+indent.log
+_minted/

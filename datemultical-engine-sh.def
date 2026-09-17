@@ -1,0 +1,270 @@
+% datemultical-engine-sh.def
+%
+% datemultical: Named dates with multi-calendar formatting for LaTeX.
+%
+% Copyright (C) 2026 Amer Amikhteh
+%
+% This file is part of the datemultical-engine package.
+%
+% This work is free software: you may redistribute it and/or modify
+% it under the terms of the LaTeX Project Public License as published
+% by the LaTeX Project, either version 1.3c of the License, or
+% (at your option) any later version.
+%
+% This work is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty
+% of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%
+% The full license text is available at:
+% https://www.latex-project.org/lppl/
+%
+% This work is "maintained" by Amer Amikhteh.
+%
+% The current maintainer of this work is Amer Amikhteh.
+
+
+\ProvidesFile{datemultical-engine-sh.def}
+[2026/09/17 v0.1.0 Solar Hijri calendar rules for the TeX backend]
+
+% =================================================
+% Solar Hijri -> JDN
+% =================================================
+
+\cs_new:Npn \dmc_sh_to_jdn:nnn #1#2#3
+{
+  \int_eval:n
+  {
+    \dmc_gr_to_jdn:nnn {1600}{3}{20}
+    +
+    365 * ( #1 - 979 )
+    +
+    8 * \int_div_truncate:nn
+    { #1 - 979 }
+    {33}
+    +
+    \int_div_truncate:nn
+    {
+      \int_mod:nn { #1 - 979 } {33} + 3
+    }
+    {4}
+    +
+    \int_compare:nTF { #2 < 7 }
+    {
+      ( #2 - 1 ) * 31
+    }
+    {
+      ( #2 - 1 ) * 30 + 6
+    }
+    +
+    #3 - 1
+  }
+}
+
+% =================================================
+% JDN -> Solar Hijri helpers
+% =================================================
+
+\cs_new:Npn \dmc_sh_days:n #1
+{
+  \int_eval:n
+  {
+    #1 - \dmc_gr_to_jdn:nnn {1600}{3}{20}
+  }
+}
+
+\cs_new:Npn \dmc_sh_cycle:n #1
+{
+  \int_div_truncate:nn
+  {
+    \dmc_sh_days:n {#1}
+  }
+  {12053}
+}
+
+\cs_new:Npn \dmc_sh_cycle_days:n #1
+{
+  \int_mod:nn
+  {
+    \dmc_sh_days:n {#1}
+  }
+  {12053}
+}
+
+\cs_new:Npn \dmc_sh_base_year:n #1
+{
+  \int_eval:n
+  {
+    979
+    +
+    33 * \dmc_sh_cycle:n {#1}
+    +
+    4 *
+    \int_div_truncate:nn
+    {
+      \dmc_sh_cycle_days:n {#1}
+    }
+    {1461}
+  }
+}
+
+\cs_new:Npn \dmc_sh_year_remainder:n #1
+{
+  \int_mod:nn
+  {
+    \dmc_sh_cycle_days:n {#1}
+  }
+  {1461}
+}
+
+\cs_new:Npn \dmc_sh_year_extra:n #1
+{
+  \int_compare:nTF
+  {
+    \dmc_sh_year_remainder:n {#1} > 365
+  }
+  {
+    \int_div_truncate:nn
+    {
+      \dmc_sh_year_remainder:n {#1} - 1
+    }
+    {365}
+  }
+  {0}
+}
+
+\cs_new:Npn \dmc_jdn_to_sh_year:n #1
+{
+  \int_eval:n
+  {
+    \dmc_sh_base_year:n {#1}
+    +
+    \dmc_sh_year_extra:n {#1}
+  }
+}
+
+% -------------------------------------------------
+% Day within Solar Hijri year
+% 0-based
+% -------------------------------------------------
+
+\cs_new:Npn \dmc_sh_day_index:n #1
+{
+  \int_eval:n
+  {
+    \int_compare:nTF
+    {
+      \dmc_sh_year_remainder:n {#1} > 365
+    }
+    {
+      \int_mod:nn
+      {
+        \dmc_sh_year_remainder:n {#1} - 1
+      }
+      {365}
+    }
+    {
+      \dmc_sh_year_remainder:n {#1}
+    }
+  }
+}
+
+% =================================================
+% JDN -> Solar Hijri month
+% Expandable
+% =================================================
+
+\cs_new:Npn \dmc_jdn_to_sh_month:n #1
+{
+  \int_eval:n
+  {
+    \int_compare:nTF
+    {
+      \dmc_sh_day_index:n {#1} < 186
+    }
+    {
+      1 +
+      \int_div_truncate:nn
+      {
+        \dmc_sh_day_index:n {#1}
+      }
+      {31}
+    }
+    {
+      7 +
+      \int_div_truncate:nn
+      {
+        \dmc_sh_day_index:n {#1} - 186
+      }
+      {30}
+    }
+  }
+}
+
+% =================================================
+% JDN -> Solar Hijri day
+% Expandable
+% =================================================
+
+\cs_new:Npn \dmc_jdn_to_sh_day:n #1
+{
+  \int_eval:n
+  {
+    \int_compare:nTF
+    {
+      \dmc_sh_day_index:n {#1} < 186
+    }
+    {
+      1 +
+      \int_mod:nn
+      {
+        \dmc_sh_day_index:n {#1}
+      }
+      {31}
+    }
+    {
+      1 +
+      \int_mod:nn
+      {
+        \dmc_sh_day_index:n {#1} - 186
+      }
+      {30}
+    }
+  }
+}
+
+% =================================================
+% native procedural JDN -> Solar Hijri interface
+% =================================================
+
+\cs_new_protected:Npn \dmc_jdn_to_sh:n #1
+{
+  \group_begin:
+
+  \int_set:Nn \l_dmc_days_int
+  { \dmc_sh_days:n {#1} }
+
+  \int_set:Nn \l_dmc_tmp_int
+  { \dmc_sh_cycle:n {#1} }
+
+  \int_set:Nn \l_dmc_y_int
+  { \dmc_jdn_to_sh_year:n {#1} }
+
+  \int_set:Nn \l_dmc_m_int
+  { \dmc_jdn_to_sh_month:n {#1} }
+
+  \int_set:Nn \l_dmc_d_int
+  { \dmc_jdn_to_sh_day:n {#1} }
+
+  \int_gset:Nn \g_dmc_sh_y_int
+  { \l_dmc_y_int }
+
+  \int_gset:Nn \g_dmc_sh_m_int
+  { \l_dmc_m_int }
+
+  \int_gset:Nn \g_dmc_sh_d_int
+  { \l_dmc_d_int }
+
+  \group_end:
+}
+
+\endinput

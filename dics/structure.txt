@@ -1,0 +1,102 @@
+cal_gregorian
+Proleptic Gregorian calendar. Granularities: `year`, `month`, `day`.
+cal_julian
+Proleptic Julian calendar. Granularities: `year`, `month`, `day`.
+cal_egyptian
+Ancient Egyptian calendar. Granularities: `year`, `month`, `day`.
+cal_armenian
+Armenian calendar (structurally identical to Egyptian). Granularities: `year`, `month`, `day`.
+cal_coptic
+Coptic calendar. Granularities: `year`, `month`, `day`.
+cal_ethiopic
+Ethiopic calendar. Granularities: `year`, `month`, `day`.
+cal_islamic
+Arithmetic Islamic (Hijri) calendar. Granularities: `year`, `month`, `day`.
+cal_islamic_observational
+Observational Islamic calendar (astronomical). Granularities: `year`, `month`, `day`.
+cal_islamic_tbla
+Saudi Islamic calendar (Umm al-Qura approximation). Granularities: `year`, `month`, `day`. Islamic TBLA calendar (Thursday epoch). Granularities: `year`, `month`, `day`.
+cal_islamic_umalqura
+Umm al-Qura Islamic calendar. Granularities: `year`, `month`, `day`.
+cal_islamic_saudi
+Observational Saudi Islamic calendar. Granularities: `year`, `month`, `day`.
+cal_islamic_umalqura_astronomical
+Astronomical Umm al-Qura calendar (conjunction before Mecca sunset). Granularities: `year`, `month`, `day`.
+cal_islamic_turkish
+Turkish Islamic calendar (Diyanet crescent visibility from Ankara). Granularities: `year`, `month`, `day`.
+cal_hebrew
+Arithmetic Hebrew calendar. Granularities: `year`, `month`, `day`.
+cal_hebrew_observational
+Observational Hebrew calendar (astronomical). Granularities: `year`, `month`, `day`.
+cal_persian
+Astronomical Persian calendar. Granularities: `year`, `month`, `day`.
+cal_persian_arithmetic
+Arithmetic Persian calendar. Granularities: `year`, `month`, `day`.
+cal_french
+Astronomical French Revolutionary calendar. Granularities: `year`, `month`, `day`.
+cal_french_arithmetic
+Arithmetic French Revolutionary calendar. Granularities: `year`, `month`, `day`.
+cal_old_hindu_solar
+Old Hindu solar calendar (Arya Siddhanta). Granularities: `year`, `month`, `day`.
+cal_hindu_solar
+Modern Hindu solar calendar (Orissa rule). Granularities: `year`, `month`, `day`.
+cal_hindu_solar_astronomical
+Astronomical Hindu solar calendar (Tamil rule). Granularities: `year`, `month`, `day`.
+cal_auc
+Ab Urbe Condita (AUC) year numbering on the Julian calendar. Granularities: `year`, `month`, `day`. Year 1 AUC = 753 BCE (Julian).
+cal_samaritan
+Samaritan calendar. Granularities: `year`, `month`, `day`.
+
+
+cal_bahai
+Arithmetic Bahá'í calendar. Granularities: `major`, `cycle`, `year`, `month`, `day`.
+cal_bahai_astronomical
+Astronomical Bahá'í calendar. Granularities: `major`, `cycle`, `year`, `month`, `day`.
+cal_chinese
+Chinese calendar. Granularities: `cycle`, `year`, `month`, `leap`, `day`.
+cal_japanese
+Japanese lunisolar calendar. Granularities: `cycle`, `year`, `month`, `leap`, `day`.
+cal_korean
+Korean lunisolar calendar. Granularities: `year`, `month`, `leap`, `day`.
+cal_vietnamese
+Vietnamese lunisolar calendar. Granularities: `cycle`, `year`, `month`, `leap`, `day`.
+cal_old_hindu_lunar
+Old Hindu lunar calendar (Arya Siddhanta). Granularities: `year`, `month`, `leap`, `day`.
+cal_hindu_lunar
+Modern Hindu lunar calendar. Granularities: `year`, `month`, `leap_month`, `day`, `leap_day`.
+cal_hindu_lunar_astronomical
+Astronomical Hindu lunar calendar. Granularities: `year`, `month`, `leap_month`, `day`, `leap_day`.
+cal_tibetan
+Tibetan calendar. Granularities: `year`, `month`, `leap_month`, `day`, `leap_day`.
+cal_olympiad
+Greek Olympiad numbering on the Julian calendar. Granularities: `cycle`, `year`, `month`, `day`. Cycle 1, year 1 = 776 BCE (Julian). `year` is 1–4 within the 4-year cycle.
+cal_babylonian
+Babylonian calendar (astronomical). Granularities: `year`, `month`, `leap`, `day`.
+
+
+
+
+cal_iso
+ISO week-date calendar. Granularities: `year`, `week`, `day`.
+cal_mayan_haab
+Mayan Haab calendar (read-only). Granularities: `month`, `day`. Cannot be used as a source for `new_date` as Haab alone does not uniquely determine a date.
+cal_aztec_xihuitl
+Aztec Xihuitl calendar (read-only). Granularities: `month`, `day`.
+
+cal_roman
+Roman calendar (Julian-based). Granularities: `year`, `month`, `event`, `count`, `leap`. `event` is one of `calendrica-julian`'s `KALENDS`, `NONES`, or `IDES` constants.
+cal_mayan_long_count
+Mayan Long Count calendar. Granularities: `baktun`, `katun`, `tun`, `uinal`, `kin`.
+cal_icelandic
+Icelandic calendar. Granularities: `year`, `season`, `week`, `weekday`.
+
+
+
+cal_mayan_tzolkin
+Mayan Tzolkin calendar (read-only). Granularities: `number`, `name`. Cannot be used as a source for `new_date` as Tzolkin alone does not uniquely determine a date.
+cal_aztec_tonalpohualli
+Aztec Tonalpohualli calendar (read-only). Granularities: `number`, `name`.
+cal_balinese
+Balinese Pawukon calendar (read-only). Granularities: `luang`, `dwiwara`, `triwara`, `caturwara`, `pancawara`, `sadwara`, `saptawara`, `asatawara`, `sangawara`, `dasawara`. The Pawukon cycle does not uniquely determine a fixed date.
+cal_akan
+Akan day-name cycle (read-only). Granularities: `prefix`, `stem`. The Akan name does not uniquely determine a fixed date.

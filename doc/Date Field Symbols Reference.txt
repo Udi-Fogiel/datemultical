@@ -1,0 +1,245 @@
+Date Field Symbols Reference (UTS #35 Date Field Symbol Table)
+==============================================================
+
+Unicode UTS #35, LDML Part 4: Dates
+Reference:
+https://unicode.org/reports/tr35/tr35-dates.html
+
+Pattern field length generally controls the field's formatting style.
+For numeric fields, the length normally specifies the minimum number
+of digits, with zero-padding as necessary.
+
+Typical field lengths:
+  1 | Numeric, 1–2 digits       | M, d, H, etc.
+  2 | Numeric, 2 digits         | MM, dd, HH, etc.
+  3 | Abbreviated               | MMM, EEE
+  4 | Wide / full               | MMMM, EEEE
+  5 | Narrow                    | MMMMM, EEEEE
+
+For some fields, additional lengths have special meanings.
+
+'l' is deprecated and no longer used.
+
+
+Era - G
+-------
+G..GGG  | Abbreviated era name.      G=AD
+GGGG    | Wide era name.              GGGG=Anno Domini
+GGGGG   | Narrow era name.            GGGGG=A
+
+
+Year - y Y u U r
+----------------
+y       | Calendar year.
+yy      | Two low-order year digits, zero-padded.
+yyyy    | Calendar year, minimum 4 digits.
+        | Example: y=2024, yy=24, yyyy=2024.
+
+Y       | Week-based year.
+YY      | Two low-order week-based year digits.
+YYYY    | Week-based year, minimum 4 digits.
+        | Used with week-of-year (w), especially for ISO week dates.
+
+u       | Extended year, without an era.
+        | All field lengths specify a minimum number of digits.
+        | Year 0 is allowed.
+
+U..UUU  | Cyclic year name, abbreviated.
+UUUU    | Cyclic year name, wide.
+UUUUU   | Cyclic year name, narrow.
+        | Used by calendars such as the Chinese calendar.
+
+r       | Related Gregorian year.
+        | Mainly relevant for non-Gregorian calendars.
+
+
+Quarter - Q q
+-------------
+Q       | Quarter, numeric or abbreviated.
+QQ      | Quarter, two digits.
+QQQ     | Abbreviated quarter name.      Q3
+QQQQ    | Wide quarter name.             3rd quarter
+QQQQQ   | Narrow quarter name.
+
+q       | Stand-alone quarter.
+        | Same width distinctions as Q, but used in stand-alone context.
+
+
+Month - M L
+-----------
+M       | Month in format context.
+        | M=9, MM=09, MMM=Sep, MMMM=September, MMMMM=S
+
+L       | Month in stand-alone context.
+        | Same width distinctions as M, but used when the month
+        | is displayed independently.
+
+
+Week / Day - w W d D F g
+------------------------
+w       | Week of year.
+ww      | Week of year, two digits.
+
+W       | Week of month.
+
+d       | Day of month.
+dd      | Day of month, two digits.
+        | Example: d=1, dd=01
+
+D       | Day of year.
+DDD     | Day of year, three digits.
+
+F       | Day of week in month.
+        | Example: F=1 means the first occurrence of that weekday
+        | within the month.
+
+g       | Modified Julian Day.
+
+
+Weekday - E e c
+---------------
+E..EEE  | Abbreviated weekday name.
+        | Example: E=Tue, EEE=Tue
+
+EEEE    | Wide / full weekday name.
+        | Example: Tuesday
+
+EEEEE   | Narrow weekday name.
+        | Example: T
+
+EEEEEE  | Short weekday name.
+        | Example: Tu
+
+e       | Local weekday.
+        | e=2, ee=02 are numeric weekday forms.
+        | eee=Tue, eeee=Tuesday
+
+c       | Stand-alone local weekday.
+        | Used for weekday names in stand-alone context.
+
+
+Day Period - a b B
+------------------
+a       | AM/PM.
+        | Example: PM
+
+b       | AM/PM, including special forms such as midnight and noon.
+
+B       | Flexible day period.
+        | Examples: morning, afternoon, evening, night.
+
+
+Hour - h H K k j J C
+--------------------
+h       | Hour in 12-hour cycle, 1–12.
+hh      | Two-digit hour.
+
+H       | Hour in 24-hour cycle, 0–23.
+HH      | Two-digit hour.
+
+K       | Hour in 12-hour cycle, 0–11.
+KK      | Two-digit hour.
+
+k       | Hour in 24-hour cycle, 1–24.
+kk      | Two-digit hour.
+
+j       | Locale-preferred hour cycle.
+        | Selects the locale's preferred hour symbol.
+
+J       | Locale-preferred hour without a day-period field.
+
+C       | Locale-dependent hour-cycle representation.
+
+
+Minute / Second / Fraction - m s S A
+------------------------------------
+m       | Minute.
+mm      | Two-digit minute.
+
+s       | Second.
+ss      | Two-digit second.
+
+S       | Fractional second.
+SS      | Hundredths of a second.
+SSS     | Thousandths of a second.
+        | Example: S=.1, SS=.12, SSS=.123
+
+A       | Milliseconds in day.
+
+
+Time Separator
+--------------
+:
+        | Literal time separator in the pattern.
+        | Its rendered form may be localized.
+
+
+Time Zone - z Z O v V
+---------------------
+z..zzz  | Short time-zone name.
+        | Example: PDT
+
+zzzz    | Long time-zone name.
+        | Example: Pacific Daylight Time
+
+Z..ZZZ  | RFC 822 / ISO-style offset.
+        | Z=-0800
+
+ZZZZ    | Localized GMT format.
+        | Example: GMT-08:00
+
+ZZZZZ   | ISO 8601 extended offset with Z for UTC.
+        | Example: -08:00 or Z
+
+O       | Short localized GMT format.
+        | Example: GMT-8
+
+OOOO    | Long localized GMT format.
+        | Example: GMT-08:00
+
+v       | Short generic time-zone name.
+        | Example: PT
+
+vvvv    | Long generic time-zone name.
+        | Example: Pacific Time
+
+V       | Short time-zone ID.
+VV      | Time-zone ID.
+        | Example: America/Los_Angeles
+
+VVV     | Time-zone exemplar city.
+        | Example: Los Angeles
+
+VVVV    | Generic location format.
+
+
+ISO 8601 Offset - X x
+---------------------
+X       | ISO 8601 offset; uses Z for zero offset.
+XX      | Basic format: -0800
+XXX     | Extended format: -08:00
+
+XXXX    | Basic format with optional seconds.
+XXXXX   | Extended format with optional seconds.
+
+x       | ISO 8601 offset; uses +0000 instead of Z.
+xx      | Basic format: +0000
+xxx     | Extended format: +00:00
+
+xxxx    | Basic format with optional seconds.
+xxxxx   | Extended format with optional seconds.
+
+
+Combined Pattern Examples
+-------------------------
+Pattern: yyyy-MM-dd HH:mm:ss
+Output:  2025-09-08 09:08:08
+
+Pattern: yyyy-MM-dd'T'HH:mm:ssXXX
+Output:  2025-09-08T09:08:08+03:30
+
+
+
+-----------------------------------
+formats:
+https://www.unicode.org/cldr/charts/49/by_type/index.html

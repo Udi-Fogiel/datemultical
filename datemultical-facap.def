@@ -1,0 +1,147 @@
+% datemultical-facap.def
+%
+% datemultical: Named dates with multi-calendar formatting for LaTeX.
+%
+% Copyright (C) 2026 Amer Amikhteh
+%
+% This file is part of the datemultical package.
+%
+% This work is free software: you may redistribute it and/or modify
+% it under the terms of the LaTeX Project Public License as published
+% by the LaTeX Project, either version 1.3c of the License, or
+% (at your option) any later version.
+%
+% This work is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty
+% of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%
+% The full license text is available at:
+% https://www.latex-project.org/lppl/
+%
+% This work is "maintained" by Amer Amikhteh.
+%
+% The current maintainer of this work is Amer Amikhteh.
+
+
+\NeedsTeXFormat{LaTeX2e}
+
+\ProvidesFile{datemultical-facap.def}
+[2026/09/17 v0.1.0 Fallback Persian date captions]
+
+
+\ExplSyntaxOn
+\makeatletter
+
+% =================================================
+% Persian Gregorian month names
+% =================================================
+
+\cs_new:Npn \dmc_month_name_gr_persian:n #1
+{
+    \int_case:nnF {#1}
+    {
+        {1}  {ژانویه}
+        {2}  {فوریه}
+        {3}  {مارس}
+        {4}  {آوریل}
+        {5}  {مه}
+        {6}  {ژوئن}
+        {7}  {ژوئیه}
+        {8}  {اوت}
+        {9}  {سپتامبر}
+        {10} {اکتبر}
+        {11} {نوامبر}
+        {12} {دسامبر}
+    }
+    {}
+}
+
+
+% =================================================
+% Persian Jalali month names
+% =================================================
+
+\cs_new:Npn \dmc_month_name_sh_persian:n #1
+{
+    \int_case:nnF {#1}
+    {
+        {1}  {فروردین}
+        {2}  {اردیبهشت}
+        {3}  {خرداد}
+        {4}  {تیر}
+        {5}  {مرداد}
+        {6}  {شهریور}
+        {7}  {مهر}
+        {8}  {آبان}
+        {9}  {آذر}
+        {10} {دی}
+        {11} {بهمن}
+        {12} {اسفند}
+    }
+    {}
+}
+
+
+% =================================================
+% Persian Islamic month names
+% =================================================
+
+\cs_new:Npn \dmc_month_name_lh_persian:n #1
+{
+    \int_case:nnF {#1}
+    {
+        {1}  {محرم}
+        {2}  {صفر}
+        {3}  {ربیع‌الاول}
+        {4}  {ربیع‌الثانی}
+        {5}  {جمادی‌الاول}
+        {6}  {جمادی‌الثانی}
+        {7}  {رجب}
+        {8}  {شعبان}
+        {9}  {رمضان}
+        {10} {شوال}
+        {11} {ذی‌القعده}
+        {12} {ذی‌الحجه}
+    }
+    {}
+}
+
+
+% =================================================
+% Persian weekday names
+% =================================================
+
+\cs_new:Npn \dmc_weekday_persian:n #1
+{
+    \int_case:nnF {#1}
+    {
+        {0} {یکشنبه}
+        {1} {دوشنبه}
+        {2} {سه‌شنبه}
+        {3} {چهارشنبه}
+        {4} {پنجشنبه}
+        {5} {جمعه}
+        {6} {شنبه}
+    }
+    {}
+}
+
+
+
+% ------------------------------------------
+% Fallback for \rl and \lr
+% ------------------------------------------
+
+\AtBeginDocument{
+    \ProvideDocumentCommand{\lr}{m}{#1}
+    \ProvideDocumentCommand{\rl}{m}{#1}
+}
+
+
+
+
+
+\makeatother
+\ExplSyntaxOff
+
+\endinput

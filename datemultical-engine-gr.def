@@ -1,0 +1,232 @@
+% datemultical-engine-gr.def
+%
+% datemultical: Named dates with multi-calendar formatting for LaTeX.
+%
+% Copyright (C) 2026 Amer Amikhteh
+%
+% This file is part of the datemultical-engine package.
+%
+% This work is free software: you may redistribute it and/or modify
+% it under the terms of the LaTeX Project Public License as published
+% by the LaTeX Project, either version 1.3c of the License, or
+% (at your option) any later version.
+%
+% This work is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty
+% of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%
+% The full license text is available at:
+% https://www.latex-project.org/lppl/
+%
+% This work is "maintained" by Amer Amikhteh.
+%
+% The current maintainer of this work is Amer Amikhteh.
+
+
+\ProvidesFile{datemultical-engine-gr.def}
+[2026/09/17 v0.1.0 Gregorian calendar rules for the TeX backend]
+
+% =================================================
+% Gregorian -> JDN
+% =================================================
+
+\cs_new:Npn \dmc_gr_to_jdn:nnn #1#2#3
+{
+  \int_eval:n
+  {
+    \int_div_truncate:nn
+    {
+      1461 *
+      (
+      #1 + 4800
+      + \int_div_truncate:nn { #2 - 14 } {12}
+      )
+    }
+    {4}
+    +
+    \int_div_truncate:nn
+    {
+      367 *
+      (
+      #2 - 2
+      - 12 * \int_div_truncate:nn { #2 - 14 } {12}
+      )
+    }
+    {12}
+    -
+    \int_div_truncate:nn
+    {
+      3 *
+      \int_div_truncate:nn
+      {
+        #1 + 4900
+        + \int_div_truncate:nn { #2 - 14 } {12}
+      }
+      {100}
+    }
+    {4}
+    + #3 - 32075
+  }
+}
+
+% =================================================
+% Gregorian JDN conversion helpers
+% =================================================
+
+\cs_new:Npn \dmc_gr_a:n #1
+{
+  \int_eval:n
+  {
+    #1 + 68569
+  }
+}
+
+\cs_new:Npn \dmc_gr_b:n #1
+{
+  \int_div_truncate:nn
+  {
+    4 * \dmc_gr_a:n {#1}
+  }
+  {146097}
+}
+
+\cs_new:Npn \dmc_gr_c:n #1
+{
+  \int_eval:n
+  {
+    \dmc_gr_a:n {#1}
+    -
+    \int_div_truncate:nn
+    {
+      146097 * \dmc_gr_b:n {#1} + 3
+    }
+    {4}
+  }
+}
+
+\cs_new:Npn \dmc_gr_d:n #1
+{
+  \int_div_truncate:nn
+  {
+    4000 * ( \dmc_gr_c:n {#1} + 1 )
+  }
+  {1461001}
+}
+
+\cs_new:Npn \dmc_gr_e:n #1
+{
+  \int_div_truncate:nn
+  {
+    80 *
+    (
+    \dmc_gr_c:n {#1}
+    -
+    \int_div_truncate:nn
+    {
+      1461 * \dmc_gr_d:n {#1}
+    }
+    {4}
+    + 31
+    )
+  }
+  {2447}
+}
+
+\cs_new:Npn \dmc_gr_tmp:n #1
+{
+  \int_div_truncate:nn
+  {
+    \dmc_gr_e:n {#1}
+  }
+  {11}
+}
+
+% =================================================
+% JDN -> Gregorian year
+% Expandable
+% =================================================
+
+\cs_new:Npn \dmc_jdn_to_gr_year:n #1
+{
+  \int_eval:n
+  {
+    100 * ( \dmc_gr_b:n {#1} - 49 )
+    + \dmc_gr_d:n {#1}
+    + \dmc_gr_tmp:n {#1}
+  }
+}
+
+% =================================================
+% JDN -> Gregorian month
+% Expandable
+% =================================================
+
+\cs_new:Npn \dmc_jdn_to_gr_month:n #1
+{
+  \int_eval:n
+  {
+    \dmc_gr_e:n {#1}
+    + 2
+    - 12 * \dmc_gr_tmp:n {#1}
+  }
+}
+
+% =================================================
+% JDN -> Gregorian day
+% Expandable
+% =================================================
+
+\cs_new:Npn \dmc_jdn_to_gr_day:n #1
+{
+  \int_eval:n
+  {
+    \dmc_gr_c:n {#1}
+    -
+    \int_div_truncate:nn
+    {
+      1461 * \dmc_gr_d:n {#1}
+    }
+    {4}
+    + 31
+    -
+    \int_div_truncate:nn
+    {
+      2447 * \dmc_gr_e:n {#1}
+    }
+    {80}
+  }
+}
+
+% =================================================
+% native procedural JDN -> Gregorian interface
+% =================================================
+
+\cs_new_protected:Npn \dmc_jdn_to_gr:n #1
+{
+  \group_begin:
+
+  \int_set:Nn \l_dmc_a_int
+  { \dmc_gr_a:n {#1} }
+
+  \int_set:Nn \l_dmc_b_int
+  { \dmc_gr_b:n {#1} }
+
+  \int_set:Nn \l_dmc_c_int
+  { \dmc_gr_c:n {#1} }
+
+  \int_set:Nn \l_dmc_e_int
+  { \dmc_gr_e:n {#1} }
+
+  \int_gset:Nn \g_dmc_gr_d_int
+  { \dmc_jdn_to_gr_day:n {#1} }
+
+  \int_gset:Nn \g_dmc_gr_m_int
+  { \dmc_jdn_to_gr_month:n {#1} }
+
+  \int_gset:Nn \g_dmc_gr_y_int
+  { \dmc_jdn_to_gr_year:n {#1} }
+
+  \group_end:
+}
+
+\endinput
