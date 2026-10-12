@@ -45,58 +45,15 @@ end
 
 local calendars = {
   -- Primary aliases
-  gr = calendrica.cal_gregorian,
-  sh = calendrica.cal_persian,
-  lh = calendrica.cal_islamic_tbla,
-
-  -- Full names
-  gregorian = calendrica.cal_gregorian,
-  julian = calendrica.cal_julian,
-  roman = calendrica.cal_roman,
-  iso = calendrica.cal_iso,
-  egyptian = calendrica.cal_egyptian,
-  armenian = calendrica.cal_armenian,
-  coptic = calendrica.cal_coptic,
-  ethiopic = calendrica.cal_ethiopic,
-  islamic = calendrica.cal_islamic,
-  islamic_observational = calendrica.cal_islamic_observational,
-  islamic_tbla = calendrica.cal_islamic_tbla,
-  islamic_umalqura = calendrica.cal_islamic_umalqura,
-  islamic_saudi = calendrica.cal_islamic_saudi,
-  islamic_umalqura_astronomical = calendrica.cal_islamic_umalqura_astronomical,
-  islamic_turkish = calendrica.cal_islamic_turkish,
-  hebrew = calendrica.cal_hebrew,
-  hebrew_observational = calendrica.cal_hebrew_observational,
-  persian = calendrica.cal_persian,
-  persian_arithmetic = calendrica.cal_persian_arithmetic,
-  french = calendrica.cal_french,
-  french_arithmetic = calendrica.cal_french_arithmetic,
-  bahai = calendrica.cal_bahai,
-  bahai_astronomical = calendrica.cal_bahai_astronomical,
-  mayan_long_count = calendrica.cal_mayan_long_count,
-  mayan_haab = calendrica.cal_mayan_haab,
-  mayan_tzolkin = calendrica.cal_mayan_tzolkin,
-  aztec_xihuitl = calendrica.cal_aztec_xihuitl,
-  aztec_tonalpohualli = calendrica.cal_aztec_tonalpohualli,
-  balinese = calendrica.cal_balinese,
-  chinese = calendrica.cal_chinese,
-  japanese = calendrica.cal_japanese,
-  korean = calendrica.cal_korean,
-  vietnamese = calendrica.cal_vietnamese,
-  old_hindu_solar = calendrica.cal_old_hindu_solar,
-  old_hindu_lunar = calendrica.cal_old_hindu_lunar,
-  hindu_solar = calendrica.cal_hindu_solar,
-  hindu_solar_astronomical = calendrica.cal_hindu_solar_astronomical,
-  hindu_lunar = calendrica.cal_hindu_lunar,
-  hindu_lunar_astronomical = calendrica.cal_hindu_lunar_astronomical,
-  tibetan = calendrica.cal_tibetan,
-  icelandic = calendrica.cal_icelandic,
-  akan = calendrica.cal_akan,
-  auc = calendrica.cal_auc,
-  olympiad = calendrica.cal_olympiad,
-  samaritan = calendrica.cal_samaritan,
-  babylonian = calendrica.cal_babylonian,
+  gr = "gregorian",
+  sh = "persian",
+  lh = "islamic-tbla",
 }
+
+-- Full names: lua-calendrica's names, with underscores for hyphens
+for _, name in ipairs(calendrica.calendars()) do
+  calendars[(name:gsub("-", "_"))] = name
+end
 
 -- =================================================
 -- Calendar lookup
@@ -123,7 +80,7 @@ end
 local function new_date(calendar, year, month, day)
   local cal = get_calendar(calendar)
 
-  return calendrica.new_date(
+  return calendrica.date(
     {
       year = tonumber(year),
       month = tonumber(month),
@@ -178,7 +135,7 @@ end
 local function new_date_from_fields(calendar, fields)
   local cal = get_calendar(calendar)
   local normalized = normalize_fields(fields)
-  return calendrica.new_date(normalized, cal)
+  return calendrica.date(normalized, cal)
 end
 
 
@@ -188,7 +145,7 @@ end
 
 function M.fields_to_rd(calendar, fields)
   local date = new_date_from_fields(calendar, fields)
-  return date._rd
+  return date.rd
 end
 
 -- =================================================
@@ -253,7 +210,7 @@ end
 
 function M.date_to_rd(calendar, year, month, day)
   local date = new_date(calendar, year, month, day)
-  return date._rd
+  return date.rd
 end
 
 -- =================================================
@@ -262,7 +219,7 @@ end
 
 function M.rd_to_date(calendar, rd)
   local cal = get_calendar(calendar)
-  return cal.from_rd(tonumber(rd))
+  return calendrica.date(tonumber(rd), cal)
 end
 
 -- =================================================
@@ -348,7 +305,7 @@ end
 function M.dateconvert(source, destination, year, month, day, part)
   local src = new_date(source, year, month, day)
   local dst = get_calendar(destination)
-  local result = calendrica.as_date(src, dst)
+  local result = src:to(dst)
 
   if part == "year" then
     tex.sprint(result.year)
